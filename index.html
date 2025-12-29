@@ -1,0 +1,1404 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#10b981" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <title>إدارة مشروع حديقة المزة</title>
+
+  <style>
+    :root{
+      --bg:#f3f4f6; 
+      --card:#ffffff; 
+      --text:#111827; 
+      --muted:#1f2937;
+      --accent:#10b981; 
+      --b:rgba(17,24,39,.12);
+      --safeB:env(safe-area-inset-bottom); 
+      --safeT:env(safe-area-inset-top);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      font-weight:700; /* حسب طلبك: أسود عريض */
+    }
+    header{
+      position:sticky;top:0;z-index:10;
+      background:rgba(255,255,255,.92);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--b);
+      padding:12px 14px;
+      padding-top:calc(12px + var(--safeT));
+    }
+    h1{margin:0;font-size:16px;font-weight:800}
+    .sub{margin-top:4px;font-size:12px;color:var(--muted);font-weight:700}
+    main{
+      padding:14px;max-width:560px;margin:0 auto;
+      padding-bottom:calc(82px + var(--safeB));
+    }
+    .card{
+      background:var(--card);
+      border:1px solid var(--b);
+      border-radius:16px;
+      padding:14px;
+      margin-bottom:12px;
+    }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .field{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+    label{font-size:12px;color:var(--text);font-weight:800}
+    input,select,textarea{
+      font-size:16px;
+      padding:12px;
+      border-radius:12px;
+      border:1px solid var(--b);
+      background:#ffffff;
+      color:var(--text);
+      outline:none;
+      font-weight:800;
+    }
+    input::placeholder,textarea::placeholder{color:rgba(17,24,39,.55)}
+    textarea{min-height:92px;resize:vertical}
+    .btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+    button{
+      flex:1;min-width:120px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid var(--b);
+      background:#e5e7eb;
+      color:var(--text);
+      font-size:15px;
+      cursor:pointer;
+      font-weight:900;
+    }
+    button.primary{
+      background:#a7f3d0;
+      border-color:rgba(16,185,129,.55);
+    }
+    button.danger{
+      background:#fecaca;
+      border-color:rgba(239,68,68,.45);
+    }
+    .muted{color:rgba(17,24,39,.85);font-size:12px;line-height:1.6;font-weight:700}
+    .notice{
+      border:1px solid rgba(245,158,11,.45);
+      background:rgba(245,158,11,.12);
+      border-radius:14px;
+      padding:10px 12px;
+      font-size:13px;
+      line-height:1.6;
+      font-weight:800;
+      color:var(--text);
+    }
+    .pill{
+      display:flex;gap:10px;align-items:flex-start;
+      border:1px solid var(--b);
+      border-radius:14px;
+      background:#f9fafb;
+      padding:10px;margin-top:10px;
+    }
+    .pill .x{border-radius:999px;width:60px;height:34px;flex:0 0 auto}
+    .nav{
+      position:fixed;left:0;right:0;bottom:0;z-index:10;
+      background:rgba(255,255,255,.95);
+      border-top:1px solid var(--b);
+      padding:10px 10px calc(10px + var(--safeB));
+    }
+    /* تم ضبط عدد الأعمدة في شريط التنقل ليتناسب مع سبعة عناصر */
+    .nav .inner{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+    .nav button{
+      min-width:unset;
+      padding:10px 8px;
+      font-size:12px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      background:#f3f4f6;
+    }
+    .nav button.active{
+      background:#a7f3d0;
+      border-color:rgba(16,185,129,.55);
+    }
+    .hidden{display:none !important}
+    pre{
+      white-space:pre-wrap;word-break:break-word;
+      background:#ffffff;
+      border:1px solid var(--b);
+      border-radius:14px;
+      padding:12px;
+      font-size:12.5px;
+      line-height:1.6;
+      max-height:45vh;
+      overflow:auto;
+      color:var(--text);
+      font-weight:800;
+    }
+    .modal{
+      position:fixed;inset:0;background:rgba(0,0,0,.35);
+      display:none;align-items:flex-end;justify-content:center;
+      padding:14px;z-index:20;
+    }
+    .modal.open{display:flex}
+    .sheet{
+      width:100%;max-width:560px;
+      background:#ffffff;
+      border:1px solid var(--b);
+      border-radius:18px;
+      overflow:hidden;
+      color:var(--text);
+    }
+    .sheetHead{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:12px 14px;border-bottom:1px solid var(--b);
+      background:#f9fafb;
+    }
+    @media print{
+      header,.nav,.no-print{display:none !important}
+      body{background:#fff;color:#000}
+      pre{background:#fff;border:1px solid #ddd;color:#000}
+    }
+</style>
+</head>
+
+<body>
+<header class="no-print">
+  <h1 id="appTitle">إدارة مشروع حديقة المزة</h1>
+  <div class="sub">تقارير يومية • خطة الغد • مواد • NCR • فحص • سجل</div>
+</header>
+
+<main>
+  <section id="v-dashboard" class="view">
+    <div class="card">
+      <b>اختصارات</b>
+      <div class="btns">
+        <button class="primary" onclick="navTo('daily')">🗓️ اليوم</button>
+        <button class="primary" onclick="navTo('plan')">🧭 الغد</button>
+        <button onclick="navTo('material')">📦 المواد</button>
+        <button onclick="navTo('history')">🗂️ السجل</button>
+      </div>
+      <div class="muted" id="lastReport">آخر تقرير: لا يوجد</div>
+    </div>
+
+    <div class="card">
+      <b>ملاحظات تشغيل</b>
+      <div class="muted">
+        1) املأ النموذج ثم “توليد”.<br/>
+        2) استخدم “واتساب/نسخ/مشاركة”.<br/>
+        3) “حفظ بالسجل” ثم صدّر JSON حسب النوع أو أنشئ مستند Google Doc للتقرير.
+      </div>
+    </div>
+  </section>
+
+  <section id="v-daily" class="view hidden">
+    <div class="card">
+      <b>تقرير اليوم</b>
+
+      <div class="row">
+        <div class="field"><label>التاريخ</label><input id="daily_date" type="date"></div>
+        <div class="field"><label>الطقس</label>
+          <select id="daily_weather"><option>مشمس</option><option>غائم</option><option>ماطر</option><option>عاصف</option></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>عدد العمال</label><input id="daily_workers" type="number" min="0" inputmode="numeric"></div>
+        <div class="field"><label>عدد المهندسين</label><input id="daily_engineers" type="number" min="0" inputmode="numeric"></div>
+      </div>
+
+      <div class="field"><label>الفئة الرئيسية</label><select id="daily_main"></select></div>
+      <div class="field"><label>الفئة الفرعية</label><select id="daily_sub"></select></div>
+      <div class="field"><label>النشاط/الخطوة</label><select id="daily_act"></select></div>
+
+      <div class="btns">
+        <button onclick="addWork('daily')">➕ إضافة بند</button>
+        <button onclick="clearPick('daily')">🧹 مسح اختيار</button>
+      </div>
+
+      <div id="daily_list" class="muted"></div>
+
+      <!-- قسم الأعمال الإدارية/التنسيقية -->
+      <div class="field"><label>الأعمال الإدارية/التنسيقية</label>
+        <select id="daily_admin_select"></select>
+      </div>
+      <div class="btns">
+        <button onclick="addAdminTask()">➕ إضافة عمل إداري</button>
+      </div>
+      <div id="daily_admin_list" class="muted"></div>
+
+      <div class="field"><label>ملاحظات</label><textarea id="daily_notes"></textarea></div>
+      <!-- اختيار المرسل للتقرير -->
+      <div class="field"><label>المرسل</label>
+        <select id="daily_sender">
+          <option value="المقاول">المقاول</option>
+          <option value="مدير المشروع">مدير المشروع</option>
+          <option value="إدارة فضاءات">إدارة فضاءات</option>
+        </select>
+      </div>
+      <div class="btns">
+        <button class="primary" onclick="generate('daily')">🧾 توليد</button>
+        <button onclick="saveDraft('daily')">💾 حفظ مسودة</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-plan" class="view hidden">
+    <div class="card">
+      <b>خطة الغد</b>
+
+      <div class="row">
+        <div class="field"><label>تاريخ الخطة</label><input id="plan_date" type="date"></div>
+        <div class="field"><label>يتطلب تواجد مدير المشروع؟</label>
+          <select id="plan_need_pm"><option value="no">لا</option><option value="yes">نعم</option></select>
+        </div>
+      </div>
+      <!-- حقول إضافية: وقت البدء والمدة التقديرية لخطة الغد -->
+      <div class="row">
+        <div class="field"><label>وقت البدء</label><input id="plan_start" type="time"></div>
+        <div class="field"><label>المدة التقديرية (ساعات)</label><input id="plan_duration" type="number" min="0" inputmode="numeric"></div>
+      </div>
+
+      <div class="field"><label>الفئة الرئيسية</label><select id="plan_main"></select></div>
+      <div class="field"><label>الفئة الفرعية</label><select id="plan_sub"></select></div>
+      <div class="field"><label>النشاط/الخطوة</label><select id="plan_act"></select></div>
+
+      <div class="btns">
+        <button onclick="addWork('plan')">➕ إضافة بند</button>
+        <button onclick="clearPick('plan')">🧹 مسح اختيار</button>
+      </div>
+
+      <div id="plan_list" class="muted"></div>
+
+      <div class="field"><label>ملاحظات</label><textarea id="plan_notes"></textarea></div>
+      <!-- اختيار المرسل للتقرير -->
+      <div class="field"><label>المرسل</label>
+        <select id="plan_sender">
+          <option value="المقاول">المقاول</option>
+          <option value="مدير المشروع">مدير المشروع</option>
+          <option value="إدارة فضاءات">إدارة فضاءات</option>
+        </select>
+      </div>
+      <div class="btns">
+        <button class="primary" onclick="generate('plan')">🧾 توليد</button>
+        <button onclick="saveDraft('plan')">💾 حفظ مسودة</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-material" class="view hidden">
+    <div class="card">
+      <b>اعتماد مواد</b>
+      <div class="notice"><b>تنبيه:</b> لديك 3 ساعات للرد داخلياً على طلب اعتماد المواد.</div>
+
+      <div class="row">
+        <div class="field"><label>تاريخ الطلب</label><input id="mat_date" type="date"></div>
+        <div class="field"><label>الحالة</label>
+          <select id="mat_status">
+            <option value="pending">قيد الدراسة</option>
+            <option value="approved">مقبول</option>
+            <option value="conditional">مقبول بملاحظات</option>
+            <option value="rejected">مرفوض</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field"><label>الفئة الرئيسية</label><select id="mat_main"></select></div>
+      <div class="field"><label>الفئة الفرعية</label><select id="mat_sub"></select></div>
+      <div class="field"><label>النشاط/الخطوة</label><select id="mat_act"></select></div>
+
+      <div class="field"><label>وصف المادة/الموديل</label><input id="mat_item" type="text"></div>
+      <div class="field"><label>المورد/المصدر</label><input id="mat_supplier" type="text"></div>
+      <div class="field"><label>ملاحظات القرار</label><textarea id="mat_notes"></textarea></div>
+
+      <!-- اختيار المرسل للتقرير -->
+      <div class="field"><label>المرسل</label>
+        <select id="mat_sender">
+          <option value="المقاول">المقاول</option>
+          <option value="مدير المشروع">مدير المشروع</option>
+          <option value="إدارة فضاءات">إدارة فضاءات</option>
+        </select>
+      </div>
+
+      <div class="btns">
+        <button class="primary" onclick="generate('material')">🧾 توليد</button>
+        <button onclick="saveDraft('material')">💾 حفظ مسودة</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-more" class="view hidden">
+    <div class="card">
+      <b>المزيد</b>
+      <div class="btns">
+        <button onclick="navTo('ncr')">⛔ NCR</button>
+        <button onclick="navTo('inspection')">🧪 طلب فحص</button>
+        <button onclick="navTo('settings')">⚙️ الإعدادات</button>
+        <button onclick="navTo('history')">🗂️ السجل</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-ncr" class="view hidden">
+    <div class="card">
+      <b>عدم مطابقة (NCR)</b>
+
+      <div class="row">
+        <div class="field"><label>رقم NCR</label><input id="ncr_no" type="text" readonly></div>
+        <div class="field"><label>الخطورة</label>
+          <select id="ncr_sev"><option value="low">منخفض</option><option value="med">متوسط</option><option value="high">عال</option></select>
+        </div>
+      </div>
+
+      <div class="field"><label>الفئة الرئيسية</label><select id="ncr_main"></select></div>
+      <div class="field"><label>الفئة الفرعية</label><select id="ncr_sub"></select></div>
+      <div class="field"><label>النشاط/الخطوة</label><select id="ncr_act"></select></div>
+
+      <div class="field"><label>وصف المخالفة</label><textarea id="ncr_desc"></textarea></div>
+      <div class="field"><label>الإجراء التصحيحي</label><textarea id="ncr_action"></textarea></div>
+      <div class="field"><label>المهلة</label><input id="ncr_deadline" type="date"></div>
+
+      <div class="field">
+        <label>مرفق صورة (اختياري)</label>
+        <input id="ncr_file" type="file" accept="image/*">
+        <div class="muted">لن تُحفظ الصورة داخل السجل إلا إذا فعّلت ذلك في الإعدادات.</div>
+      </div>
+
+      <!-- اختيار المرسل للتقرير -->
+      <div class="field"><label>المرسل</label>
+        <select id="ncr_sender">
+          <option value="المقاول">المقاول</option>
+          <option value="مدير المشروع">مدير المشروع</option>
+          <option value="إدارة فضاءات">إدارة فضاءات</option>
+        </select>
+      </div>
+
+      <div class="btns">
+        <button class="danger" onclick="generate('ncr')">⛔ توليد</button>
+        <button onclick="saveDraft('ncr')">💾 حفظ مسودة</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-inspection" class="view hidden">
+    <div class="card">
+      <b>طلب فحص</b>
+
+      <div class="row">
+        <div class="field"><label>تاريخ/وقت مقترح</label><input id="insp_dt" type="datetime-local"></div>
+        <div class="field"><label>يتطلب حضور مدير المشروع؟</label>
+          <select id="insp_need_pm"><option value="no">لا</option><option value="yes">نعم</option></select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>نوع الفحص</label>
+          <select id="insp_type"><option>مدني/إنشائي</option><option>تشطيبات</option><option>ري/ميكانيك</option><option>كهرباء/إنارة</option><option>زراعة/حدائق</option><option>أخرى</option></select>
+        </div>
+        <div class="field"><label>الموقع/المكان</label><input id="insp_loc" type="text"></div>
+      </div>
+
+      <div class="field"><label>سبب/وصف الطلب</label><textarea id="insp_notes"></textarea></div>
+      <!-- اختيار المرسل للتقرير -->
+      <div class="field"><label>المرسل</label>
+        <select id="insp_sender">
+          <option value="المقاول">المقاول</option>
+          <option value="مدير المشروع">مدير المشروع</option>
+          <option value="إدارة فضاءات">إدارة فضاءات</option>
+        </select>
+      </div>
+      <div class="btns">
+        <button class="primary" onclick="generate('inspection')">🧪 توليد</button>
+        <button onclick="saveDraft('inspection')">💾 حفظ مسودة</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-history" class="view hidden">
+    <div class="card">
+      <b>السجل</b>
+
+      <div class="row">
+        <div class="field"><label>بحث</label><input id="hist_q" type="text"></div>
+        <div class="field"><label>النوع</label>
+          <select id="hist_type">
+            <option value="all">الكل</option>
+            <option value="daily">تقرير يومي</option>
+            <option value="plan">خطة الغد</option>
+            <option value="material">اعتماد مواد</option>
+            <option value="ncr">NCR</option>
+            <option value="inspection">طلب فحص</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="btns">
+        <button onclick="exportJSONFiltered()">⬇️ JSON حسب الفلتر</button>
+        <button onclick="exportJSONAll()">⬇️ JSON الكل</button>
+      </div>
+      <div class="btns">
+        <button onclick="exportToSheetFiltered()">📤 Google Sheet حسب الفلتر</button>
+        <button onclick="testWebhook()">🔗 اختبار Sheet</button>
+      </div>
+
+      <div id="hist_list" class="muted" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <section id="v-settings" class="view hidden">
+    <div class="card">
+      <b>الإعدادات</b>
+
+      <div class="field"><label>اسم المشروع</label><input id="set_title" type="text"></div>
+      <div class="field"><label>اسم المُدخل (توقيع)</label><input id="set_name" type="text" placeholder="مثال: خالد - مدير المشروع"></div>
+
+      <div class="row">
+        <div class="field"><label>تاريخ بدء المشروع</label><input id="set_start" type="date"></div>
+        <div class="field"><label>المدة (يوم)</label><input id="set_dur" type="number" min="1" inputmode="numeric"></div>
+      </div>
+
+      <div class="row">
+        <div class="field"><label>حد السجل</label><input id="set_max" type="number" min="0" inputmode="numeric" placeholder="200 (0 بلا حد)"></div>
+        <div class="field"><label>حفظ المرفقات داخل السجل؟</label>
+          <select id="set_keep_files"><option value="no">لا</option><option value="yes">نعم</option></select>
+        </div>
+      </div>
+
+      <div class="field"><label>Google Sheets Webhook URL (اختياري)</label><input id="set_webhook" type="url"></div>
+
+      <!-- إعدادات الأرشفة على مستندات Google -->
+      <div class="field"><label>Google Docs Webhook URL</label><input id="set_doc_webhook" type="url"></div>
+      <div class="field"><label>توكن الأمان (مخفي)</label><input id="set_doc_token" type="password"></div>
+
+      <div class="btns">
+        <button class="primary" onclick="saveSettings()">💾 حفظ</button>
+        <button onclick="navTo('dashboard')">↩️ رجوع</button>
+      </div>
+
+      <div class="btns">
+        <button class="danger" onclick="resetAll()">🧨 مسح كل البيانات</button>
+      </div>
+
+      <div class="muted">النسخ الاحتياطي: من “السجل” صدّر JSON حسب النوع.</div>
+    </div>
+  </section>
+</main>
+
+<!--
+  تم تحديث شريط التنقل ليحتوي سبعة تبويبات واضحة كما طلب المستخدم.
+  تمت إزالة زر "المزيد" واستبداله بأزرار مستقلة لطلب الفحص وNCR والإعدادات.
+-->
+<nav class="nav no-print">
+  <div class="inner">
+    <button id="n-dashboard" onclick="navTo('dashboard')">🏠<div>الرئيسية</div></button>
+    <button id="n-daily" onclick="navTo('daily')">🗓️<div>اليوم</div></button>
+    <button id="n-plan" onclick="navTo('plan')">🧭<div>الغد</div></button>
+    <button id="n-material" onclick="navTo('material')">📦<div>المواد</div></button>
+    <button id="n-inspection" onclick="navTo('inspection')">🧪<div>الفحص</div></button>
+    <button id="n-ncr" onclick="navTo('ncr')">⛔<div>NCR</div></button>
+    <button id="n-settings" onclick="navTo('settings')">⚙️<div>الإعدادات</div></button>
+  </div>
+</nav>
+
+<div class="modal no-print" id="outModal" role="dialog" aria-modal="true">
+  <div class="sheet">
+    <div class="sheetHead">
+      <b id="outTitle">النص</b>
+      <button onclick="closeOut()">إغلاق</button>
+    </div>
+    <div style="padding:12px 14px">
+      <pre id="outText"></pre>
+
+      <div class="btns">
+        <button class="primary" onclick="shareText()">📤 مشاركة</button>
+        <button onclick="copyText()">📋 نسخ</button>
+      </div>
+      <div class="btns">
+        <button onclick="waText()">💬 واتساب</button>
+        <button onclick="downloadTXT()">📄 TXT</button>
+      </div>
+      <div class="btns">
+        <button onclick="printText()">🖨️ طباعة/PDF</button>
+        <button class="primary" onclick="saveToHistory()">🗂️ حفظ بالسجل</button>
+      </div>
+      <div class="btns">
+        <button onclick="docCurrent()">📄 Google Doc</button>
+      </div>
+
+      <div class="muted" id="outHint"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY = "mazza_pm_v3_store";
+const DEFAULTS = {
+  settings: {
+    title: "إدارة مشروع حديقة المزة",
+    name: "",
+    startDate: new Date().toISOString().slice(0,10),
+    durationDays: 45,
+    maxReports: 200,
+    keepFiles: "no",
+    webhookUrl: "",
+    // روابط وتوكنات الأرشفة عبر مستندات Google
+    docWebhookUrl: "",
+    docWebhookToken: ""
+  },
+  drafts: {},
+  reports: [],
+  pendingDocs: []
+};
+
+let TAXONOMY = [];
+const TAX_CACHE_KEY = "mazza_pm_v3_taxonomy_cache";
+// Fallback taxonomy (used only if taxonomy.json is missing/unreachable)
+const EMBED_TAXONOMY = [{"main": "الشلال", "subs": [{"sub": "صيانة وتأهيل", "acts": ["كشف مبدئي وتوثيق الحالة (صور/ملاحظات)", "إزالة العوائق/المخلفات من المسار", "تنظيف أحواض/قنوات الشلال", "إصلاح/ترميم سطح الخرسانة المتضرر", "معالجة شروخ/فواصل (سد/حقن حسب الحاجة)", "تنعيم وتجهيز السطح قبل العزل", "فحص ميول/تصريف وتعديل عند الحاجة", "اختبار مبدئي للمسار بالماء", "تنظيف نهائي قبل التسليم", "استلام أولي مع الملاحظات"]}, {"sub": "أنابيب ووصلات", "acts": ["تحديد مسارات الأنابيب ونقاط الربط", "فك/إزالة التالف من الأنابيب والوصلات", "توريد أنابيب ووصلات مطابقة", "تركيب الأنابيب وتثبيت المسارات", "تركيب محابس/فلاتر (إن وجدت)", "عزل نقاط الربط والاختراقات", "اختبار ضغط/تسريب", "تصحيح التسريبات وإعادة الاختبار", "تنظيم وربط نهائي داخل غرفة المضخة", "توثيق مخطط المسار بعد التنفيذ"]}, {"sub": "عزل مائي", "acts": ["تجهيز السطح وإزالة الأتربة والزيوت", "برايمر (إن لزم) حسب نظام العزل", "تطبيق طبقة عزل أولى", "تطبيق طبقة عزل ثانية (مع تداخلات)", "عزل الزوايا والفواصل والاختراقات", "حماية طبقة العزل (طبقة حماية/لياسة)", "اختبار غمر/تسريب لمدة كافية", "معالجة نقاط الضعف وإعادة الاختبار", "تنظيف محيط العمل بعد العزل", "استلام عزل (محضر/صور)"]}, {"sub": "مضخات وتشغيل", "acts": ["توريد/تثبيت المضخة أو صيانة الموجودة", "توصيل كهربائي آمن (قاطع/تأريض)", "تركيب صمامات عدم رجوع (إن وجدت)", "ضبط الارتفاع/التدفق (Calibration)", "تشغيل تجريبي أولي", "مراقبة الضجيج/الاهتزاز ومعالجة", "اختبار تدفق/ضغط فعلي على الشلال", "تشغيل مستمر مدة اختبار", "تسليم تشغيلي وتعليمات تشغيل", "توقيع استلام نهائي"]}]}, {"main": "الدرج", "subs": [{"sub": "إكساء الدرج", "acts": ["رفع قياسات الدرج وتحديد التفاصيل", "تقديم عينة/موك أب للموافقة", "توريد مواد الإكساء إلى الموقع", "تجهيز السطح (تنظيف/تسوية)", "قص وتجهيز القطع حسب المقاسات", "تركيب القطع وتثبيت المناسيب", "ترويب الفواصل ومعالجة الحواف", "تنظيف أولي بعد التركيب", "فحص استواء/تفاوت وإصلاح", "تنظيف نهائي وتسليم"]}, {"sub": "حماية وتفاصيل", "acts": ["تحديد نقاط الحماية المطلوبة", "توريد ملحقات الحماية (إن وجدت)", "تركيب وتثبيت الملحقات", "معالجة الحواف/الزوايا الحادة", "فحص الأمان والالتصاق/الثبات", "تصحيح أي تفكك أو فراغات", "تنظيف موقع العمل", "توثيق قبل/بعد", "استلام أولي", "استلام نهائي"]}, {"sub": "درابزين", "acts": ["رفع المقاسات وخط السير", "توريد الدرابزين/الإكسسوارات", "تجهيز قواعد التثبيت", "تركيب وتثبيت ميكانيكي", "عزل/إغلاق نقاط التثبيت", "فحص صلابة وتحمل", "تشطيب/دهان (إن وجد)", "تنظيف وصيانة سطحية", "استلام مع الملاحظات", "تسليم نهائي"]}]}, {"main": "المظلة المطرية", "subs": [{"sub": "قواعد ودعامات", "acts": ["تحديد مواقع القواعد على الطبيعة", "فحص تحمل/تسليح الموقع (إن لزم)", "حفر وتجهيز قواعد التثبيت", "توريد قواعد/دعامات", "تركيب الدعامات وضبط الشاقول", "تثبيت ميكانيكي وربط نهائي", "عزل نقاط التثبيت ضد المياه", "فحص ثبات وتحمل", "تنظيف محيط العمل", "استلام نهائي"]}, {"sub": "تجميع وتركيب", "acts": ["توريد عناصر المظلة", "تجميع أولي على الأرض (إن لزم)", "رفع وتركيب على الدعامات", "ضبط ميلان وتصريف المياه", "تركيب الملحقات/المزاريب (إن وجدت)", "إحكام الربط ومنع الاهتزاز", "اختبار تصريف بالماء", "معالجة أي تسريب/تجمع", "تنظيف نهائي", "تسليم تشغيلي"]}]}, {"main": "الواجهة الجانبية (مولد/خزانات/تكييف)", "subs": [{"sub": "ستائر إخفاء", "acts": ["رفع القياسات وتحديد التصميم", "اعتماد الشكل/العينة", "توريد الستائر/الهيكل", "تجهيز نقاط التثبيت", "تركيب الستائر وضبط الاستقامة", "فحص الثبات ضد الرياح", "معالجة الحواف/القطع", "تنظيف موقع العمل", "استلام أولي", "تسليم نهائي"]}, {"sub": "مشربيات/كسوة حجرية", "acts": ["تقييم الحالة الحالية", "تنظيف وإزالة التالف", "توريد حجر/بدائل مناسبة (إن لزم)", "تركيب/ترميم موضعي", "معالجة الفواصل والترويب", "فحص التثبيت", "تنظيف وتلميع", "تصحيح أي تفاوت", "استلام أولي", "استلام نهائي"]}]}, {"main": "الممر بجانب الاستوديو", "subs": [{"sub": "رخام", "acts": ["تحديد حدود الممر ورفع القياسات", "اعتماد نوع/عينة الرخام", "توريد الرخام للموقع", "تحضير القاعدة (تسوية/مونة)", "قص وتجهيز القطع", "تركيب وتثبيت المناسيب", "ترويب ومعالجة الفواصل", "جلي/تلميع (إن لزم)", "تنظيف نهائي", "استلام نهائي"]}, {"sub": "حواجز/حصر حجر للعشب", "acts": ["تحديد مسار الحاجز على الطبيعة", "حفر/تجهيز القاعدة", "توريد الحاجز/الحجر", "تركيب وتثبيت", "ضبط الاستقامة والارتفاع", "ترويب/تثبيت نهائي", "فحص المتانة", "تنظيف محيط العمل", "استلام أولي", "استلام نهائي"]}]}, {"main": "الأحواض", "subs": [{"sub": "صيانة الجدران", "acts": ["كشف الأحواض وتحديد التلف", "إزالة أجزاء مفككة/متضررة", "ترميم/لياسة موضعية", "معالجة شروخ وفواصل", "عزل داخلي (إن لزم)", "تنظيف الحواف", "فحص استواء وميول", "تنظيف نهائي", "استلام أولي", "استلام نهائي"]}, {"sub": "تربة وتجهيز", "acts": ["توريد تربة زراعية", "تفريغ وفرش التربة", "خلط مع محسنات/سماد (إن لزم)", "تسوية وتشكيل أحواض", "ري أولي للتثبيت", "إضافة طبقة تغطية/ملش (إن لزم)", "فحص مستوى التربة", "تنظيف محيط العمل", "اعتماد جاهزية للزراعة", "تسليم"]}]}, {"main": "الجلسة الدائرية", "subs": [{"sub": "صبة إسمنتية مسلحة", "acts": ["تحديد الموقع والقياسات", "تجهيز الشدة/القوالب", "تسليح حسب المخطط المتاح", "صب الخرسانة", "هز/دمك ومعالجة سطحية", "معالجة/إنضاج (Curing)", "فك الشدة بعد المدة", "معالجة تعشيش/عيوب", "تنظيف محيط العمل", "استلام أولي"]}, {"sub": "رخام الجلسة", "acts": ["اعتماد عينة الرخام", "توريد الرخام", "قص وتجهيز", "تركيب وتثبيت", "ترويب ومعالجة", "جلي/تلميع (إن لزم)", "تنظيف", "فحص استواء", "تصحيح أي عيوب", "استلام نهائي"]}, {"sub": "حجر بازلتي", "acts": ["اعتماد نوع/عينة البازلت", "توريد البازلت", "تحضير القاعدة", "تركيب حول الجلسة", "ترويب/تثبيت", "فحص منسوب/استقامة", "تنظيف", "تصحيح أي تفاوت", "استلام أولي", "استلام نهائي"]}]}, {"main": "المظلة المعدنية", "subs": [{"sub": "حف وتحضير", "acts": ["حماية المناطق المحيطة", "حف/صنفره إزالة صدأ", "تنظيف الغبار بعد الحف", "معالجة صدأ موضعي", "فحص جاهزية للدهان", "تجهيز أدوات السلامة", "تغطية أماكن لا تُدهَن", "تنفيذ تصحيح سطحي", "تنظيف نهائي قبل الدهان", "اعتماد جاهزية"]}, {"sub": "دهان", "acts": ["تطبيق برايمر", "فحص تغطية البرايمر", "دهان طبقة أولى", "فترة جفاف/تصلب", "دهان طبقة ثانية", "فحص سماكة/تغطية", "معالجة فقاعات/عيوب", "تنظيف آثار الدهان", "استلام أولي", "استلام نهائي"]}, {"sub": "تعتيق/تشطيب", "acts": ["اختبار لون التعتيق (عينة)", "تنفيذ التعتيق", "تثبيت النتيجة بطبقة حماية (إن وجدت)", "فحص التناسق", "تصحيح مناطق غير متجانسة", "تنظيف نهائي", "إزالة الحماية المؤقتة", "توثيق قبل/بعد", "استلام أولي", "استلام نهائي"]}, {"sub": "تركيب/تثبيت", "acts": ["توريد العناصر المعدنية", "تركيب في الموقع", "تثبيت ميكانيكي", "عزل نقاط التثبيت", "فحص ثبات/اهتزاز", "تعديل شد/توازن", "تنظيف", "استلام أولي", "ملاحظات نهائية", "تسليم"]}]}, {"main": "الكهرباء والإنارة", "subs": [{"sub": "تمديدات", "acts": ["تحديد نقاط الإنارة ومسارات الكابلات", "توريد كابلات/قنوات", "تمديد القنوات/المواسير", "سحب الكابلات", "عزل نقاط الوصل", "تأريض (إن وجد)", "اختبار استمرارية/عزل", "ترقيم الكابلات", "تنظيم داخل اللوحات", "استلام أولي"]}, {"sub": "تركيب وحدات إنارة", "acts": ["توريد وحدات الإنارة", "تركيب القواعد/الحوامل", "توصيل كهربائي", "عزل مانع ماء (IP) حسب الحاجة", "اختبار إضاءة", "ضبط اتجاه/زاوية", "تصحيح أعطال", "تنظيف", "استلام أولي", "استلام نهائي"]}, {"sub": "لوحة تحكم/مؤقت", "acts": ["توريد اللوحة/المؤقت", "تركيب اللوحة", "توصيل التغذية", "برمجة المؤقت", "اختبار تشغيل/إيقاف", "اختبار أحمال", "توثيق إعدادات", "تسليم تشغيلي", "مراجعة نهائية", "استلام نهائي"]}]}, {"main": "العشب الطبيعي", "subs": [{"sub": "تحضير الموقع", "acts": ["تنظيف وإزالة مخلفات", "تحديد حدود المساحات", "تسوية الأرض", "إضافة تربة/رمل حسب الحاجة", "دحل خفيف وتسوية", "تسميد تأسيسي", "ري تأسيسي", "فحص منسوب", "اعتماد جاهزية للزراعة", "تسليم مرحلة"]}, {"sub": "زراعة", "acts": ["توريد رولات/شتول العشب", "فرش وتركيب الرولات", "قص وتشكيل الحواف", "تثبيت ومنع فراغات", "ري أولي كثيف", "معالجة مناطق ضعيفة", "ري دوري أول أسبوع", "قص أول (بعد التثبيت)", "تسميد متابعة", "استلام نهائي"]}, {"sub": "عناية وتشغيل", "acts": ["برنامج ري يومي", "ضبط مؤقتات الري", "فحص تصريف/تجمع مياه", "مكافحة آفات (إن لزم)", "تقليم/قص دوري", "ترقيع فراغات", "تنظيف المسطحات", "توثيق الحالة", "استلام متابعة", "إغلاق ملاحظات"]}]}, {"main": "شبكة الري + المضخة + الخزانات", "subs": [{"sub": "شبكة ري أوتوماتيكية", "acts": ["تحديد مناطق الري", "تصميم مسارات الشبكة", "توريد أنابيب/مرشات/فلاتر", "حفر/تمديد الأنابيب", "تركيب مرشات/نقاط تنقيط", "تركيب محابس/فالات", "اختبار ضغط", "ضبط توزيع المياه", "إصلاح تسريبات", "تسليم تشغيلي"]}, {"sub": "مضخة", "acts": ["توريد المضخة/الملحقات", "تركيب قاعدة المضخة", "ربط السحب/الدفع", "توصيل كهرباء وتأريض", "تشغيل تجريبي", "اختبار ضغط/تدفق", "ضبط الحماية (قاطع/حساس إن وجد)", "اختبار تشغيل تلقائي", "توثيق إعدادات", "تسليم"]}, {"sub": "خزانات", "acts": ["فحص خزانات موجودة", "صيانة/تنظيف داخلي", "توريد خزان جديد (إن لزم)", "تركيب وتثبيت", "ربط الشبكة بالخزان", "اختبار تسريب", "تعقيم/تنظيف", "تغطية وحماية", "استلام أولي", "استلام نهائي"]}]}, {"main": "النباتات", "subs": [{"sub": "توريد", "acts": ["تجميع قائمة الأصناف", "تحديد أحجام/مواصفات", "توريد إلى الموقع", "فرز وفحص جودة", "تخزين مؤقت مظلل", "ري أولي عند الاستلام", "استبدال المتضرر", "تسليم توريد", "توثيق صور", "إغلاق مرحلة"]}, {"sub": "زراعة", "acts": ["تجهيز الأحواض/التربة", "توزيع النباتات حسب المخطط", "زراعة وتثبيت", "إضافة سماد تأسيسي", "ري بعد الزراعة", "تثبيت دعامات (إن لزم)", "تنظيف الموقع", "فحص استقامة/توزيع", "استلام أولي", "استلام نهائي"]}, {"sub": "عناية وصيانة", "acts": ["برنامج ري", "تقليم", "مكافحة آفات", "تنظيف أوراق", "استبدال تالف", "تسميد متابعة", "فحص دوري", "توثيق", "استلام متابعة", "إغلاق ملاحظات"]}]}, {"main": "أعمال عامة", "subs": [{"sub": "تنظيف وترحيل", "acts": ["جمع مخلفات يومي", "فرز مخلفات (إن أمكن)", "تحميل", "نقل وترحيل", "تفريغ في الموقع المعتمد", "تنظيف بعد الترحيل", "مسح/غسيل أرضيات", "تنظيف أدوات", "إغلاق منطقة العمل", "استلام"]}, {"sub": "سلامة وتنظيم موقع", "acts": ["تحديد مسارات حركة", "لوحات تحذيرية", "تأمين أدوات السلامة", "تنظيم تخزين مواد", "حماية المناطق الحساسة", "ضبط دخول/خروج", "فحص يومي للسلامة", "معالجة مخاطر", "توثيق", "إغلاق ملاحظات"]}]}];
+
+// قائمة الأعمال الإدارية/التنسيقية الافتراضية.
+const ADMIN_TASKS = ["اجتماع","استلام/تسليم","تنسيق مواد","مراجعة مخططات","توجيهات","ملاحظات"];
+
+let state = loadState();
+let current = null;
+
+const $ = (id) => document.getElementById(id);
+const uid = () => Math.random().toString(16).slice(2,10) + "-" + Date.now().toString(16);
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(KEY);
+    if (!raw) return structuredClone(DEFAULTS);
+    const p = JSON.parse(raw);
+    return {
+      settings: {...DEFAULTS.settings, ...(p.settings||{})},
+      drafts: p.drafts || {},
+      reports: Array.isArray(p.reports) ? p.reports : [],
+      pendingDocs: Array.isArray(p.pendingDocs) ? p.pendingDocs : []
+    };
+  } catch(e) { return structuredClone(DEFAULTS); }
+}
+function saveState() {
+  localStorage.setItem(KEY, JSON.stringify(state));
+  $("appTitle").textContent = state.settings.title || DEFAULTS.settings.title;
+}
+async function loadTaxonomy() {
+  const fromLocal = () => {
+    try {
+      const raw = localStorage.getItem(TAX_CACHE_KEY);
+      if (!raw) return null;
+      const data = JSON.parse(raw);
+      return (Array.isArray(data) && data.length) ? data : null;
+    } catch (e) { return null; }
+  };
+
+  // 1) Try network/file
+  try {
+    const r = await fetch("./taxonomy.json", { cache: "reload" });
+    if (r.ok) {
+      const data = await r.json();
+      if (Array.isArray(data) && data.length) {
+        localStorage.setItem(TAX_CACHE_KEY, JSON.stringify(data));
+        return data;
+      }
+    }
+  } catch (e) {
+    // ignore
+  }
+
+  // 2) Fallback to cached taxonomy
+  const cached = fromLocal();
+  if (cached) return cached;
+
+  // 3) Final fallback (embedded)
+  return EMBED_TAXONOMY;
+}
+
+// قائمة المشاهد المتاحة؛ تم إزالة "more" وإضافة الترتيب الجديد
+const views = ["dashboard","daily","plan","material","inspection","ncr","settings","history"];
+function navTo(v) {
+  // إخفاء وعرض المشاهد
+  views.forEach(x => $("v-"+x).classList.toggle("hidden", x!==v));
+  // إبراز الزر النشط في الشريط السفلي
+  const navBtns = ["dashboard","daily","plan","material","inspection","ncr","settings"];
+  navBtns.forEach(x => {
+    const btn = $("n-"+x);
+    if (btn) btn.classList.toggle("active", x===v);
+  });
+  localStorage.setItem("mazza_pm_v3_last_view", v);
+  if (v==="history") renderHistory();
+  if (v==="settings") fillSettings();
+  if (v==="ncr") refreshNcrNo();
+  window.scrollTo({top:0,behavior:"instant"});
+}
+
+function fillMain(prefix) {
+  const m = $(prefix+"_main");
+  m.innerHTML = "";
+  TAXONOMY.forEach(t => {
+    const o=document.createElement("option");
+    o.value=t.main; o.textContent=t.main;
+    m.appendChild(o);
+  });
+  m.addEventListener("change", () => fillSub(prefix));
+  fillSub(prefix);
+}
+function fillSub(prefix) {
+  const main = $(prefix+"_main").value;
+  const t = TAXONOMY.find(x=>x.main===main);
+  const s = $(prefix+"_sub"); s.innerHTML="";
+  (t?.subs||[]).forEach(sub => {
+    const o=document.createElement("option");
+    o.value=sub.sub; o.textContent=sub.sub;
+    s.appendChild(o);
+  });
+  s.addEventListener("change", () => fillAct(prefix));
+  fillAct(prefix);
+}
+function fillAct(prefix) {
+  const main = $(prefix+"_main").value;
+  const sub = $(prefix+"_sub").value;
+  const t = TAXONOMY.find(x=>x.main===main);
+  const ss = t?.subs?.find(x=>x.sub===sub);
+  const a = $(prefix+"_act"); a.innerHTML="";
+  (ss?.acts||["—"]).forEach(act => {
+    const o=document.createElement("option");
+    o.value=act; o.textContent=act;
+    a.appendChild(o);
+  });
+}
+
+// ====== إدارة الأعمال الإدارية/التنسيقية ======
+function fillAdminSelect(){
+  const sel = $("daily_admin_select");
+  if (!sel) return;
+  sel.innerHTML = "";
+  ADMIN_TASKS.forEach(task => {
+    const o=document.createElement("option");
+    o.value=task; o.textContent=task;
+    sel.appendChild(o);
+  });
+}
+
+function addAdminTask(){
+  const sel = $("daily_admin_select");
+  const val = sel && sel.value;
+  if (!val) return;
+  const d=getDraft("daily");
+  d.admin = Array.isArray(d.admin) ? d.admin : [];
+  d.admin.push(val);
+  setDraft("daily", d);
+  renderAdminList();
+}
+
+function removeAdminTask(idx){
+  const d=getDraft("daily");
+  if (!Array.isArray(d.admin)) return;
+  d.admin.splice(idx,1);
+  setDraft("daily", d);
+  renderAdminList();
+}
+
+function renderAdminList(){
+  const el = $("daily_admin_list");
+  if (!el) return;
+  const d=getDraft("daily");
+  const list = Array.isArray(d.admin) ? d.admin : [];
+  if (!list.length){ el.textContent=""; return; }
+  el.innerHTML="";
+  list.forEach((item, idx) => {
+    const div=document.createElement("div");
+    div.className="pill";
+    div.innerHTML = `<div style="flex:1">${idx+1}) ${item}</div><button class="danger" onclick="removeAdminTask(${idx})">✖️</button>`;
+    el.appendChild(div);
+  });
+}
+function clearPick(prefix){ fillAct(prefix); }
+
+function getDraft(type) {
+  const d = state.drafts[type];
+  if (d) return d;
+  const today = new Date().toISOString().slice(0,10);
+  if (type==="daily") return {date:today,weather:"مشمس",workers:0,engineers:0,work:[],admin:[],notes:"",sender:"مدير المشروع"};
+  if (type==="plan") return {date:new Date(Date.now()+86400000).toISOString().slice(0,10),start:"",duration:0,need_pm:"no",work:[],notes:"",sender:"مدير المشروع"};
+  if (type==="material") return {date:today,status:"pending",main:"",sub:"",act:"",item:"",supplier:"",notes:"",sender:"مدير المشروع"};
+  if (type==="ncr") return {no:"",sev:"low",main:"",sub:"",act:"",desc:"",action:"",deadline:today,file:null,sender:"مدير المشروع"};
+  if (type==="inspection") return {dt:"",need_pm:"no",type:"مدني/إنشائي",loc:"",notes:"",sender:"مدير المشروع"};
+  return {};
+}
+function setDraft(type, d){ state.drafts[type]=d; saveState(); }
+function saveDraft(type){ setDraft(type, readForm(type)); toast("تم حفظ المسودة."); }
+
+function addWork(type) {
+  const d=getDraft(type);
+  const main=$(type+"_main").value, sub=$(type+"_sub").value, act=$(type+"_act").value;
+  d.work = d.work || [];
+  d.work.push({main,sub,act,note:""});
+  setDraft(type,d);
+  renderWork(type);
+}
+function delWork(type,i){
+  const d=getDraft(type);
+  d.work.splice(i,1);
+  setDraft(type,d);
+  renderWork(type);
+}
+function setNote(type,i,val){
+  const d=getDraft(type);
+  d.work[i].note=val;
+  setDraft(type,d);
+}
+function renderWork(type){
+  const d=getDraft(type);
+  const list = d.work||[];
+  const el=$(type+"_list");
+  if (!list.length){ el.textContent="لا يوجد بنود مضافة بعد."; return; }
+  el.innerHTML="";
+  list.forEach((w,i)=>{
+    const div=document.createElement("div");
+    div.className="pill";
+    div.innerHTML = `
+      <button class="x danger" onclick="delWork('${type}',${i})">حذف</button>
+      <div style="flex:1;min-width:0">
+        <div><b>${w.main}</b> / ${w.sub} / ${w.act}</div>
+        <input style="margin-top:8px" value="${(w.note||"").replaceAll('"','&quot;')}"
+               placeholder="ملاحظة (اختياري)" oninput="setNote('${type}',${i},this.value)">
+      </div>`;
+    el.appendChild(div);
+  });
+}
+
+function readForm(type){
+  if (type==="daily"){
+    const d=getDraft("daily");
+    return {
+      date:$("daily_date").value,
+      weather:$("daily_weather").value,
+      workers:Number($("daily_workers").value||0),
+      engineers:Number($("daily_engineers").value||0),
+      work:d.work||[],
+      admin:d.admin||[],
+      notes:$("daily_notes").value||"",
+      sender:$("daily_sender").value||""
+    };
+  }
+  if (type==="plan"){
+    const d=getDraft("plan");
+    return {
+      date:$("plan_date").value,
+      start:$("plan_start").value,
+      duration:Number($("plan_duration").value||0),
+      need_pm:$("plan_need_pm").value,
+      work:d.work||[],
+      notes:$("plan_notes").value||"",
+      sender:$("plan_sender").value||""
+    };
+  }
+  if (type==="material"){
+    return {
+      date:$("mat_date").value,
+      status:$("mat_status").value,
+      main:$("mat_main").value,
+      sub:$("mat_sub").value,
+      act:$("mat_act").value,
+      item:$("mat_item").value||"",
+      supplier:$("mat_supplier").value||"",
+      notes:$("mat_notes").value||"",
+      sender:$("mat_sender").value||""
+    };
+  }
+  if (type==="ncr"){
+    const d=getDraft("ncr");
+    return {
+      no:$("ncr_no").value,
+      sev:$("ncr_sev").value,
+      main:$("ncr_main").value,
+      sub:$("ncr_sub").value,
+      act:$("ncr_act").value,
+      desc:$("ncr_desc").value||"",
+      action:$("ncr_action").value||"",
+      deadline:$("ncr_deadline").value,
+      file:d.file||null,
+      sender:$("ncr_sender").value||""
+    };
+  }
+  if (type==="inspection"){
+    return {
+      dt:$("insp_dt").value,
+      need_pm:$("insp_need_pm").value,
+      type:$("insp_type").value,
+      loc:$("insp_loc").value||"",
+      notes:$("insp_notes").value||"",
+      sender:$("insp_sender").value||""
+    };
+  }
+  return getDraft(type);
+}
+function fillForm(type){
+  const d=getDraft(type);
+  if (type==="daily"){
+    $("daily_date").value=d.date; $("daily_weather").value=d.weather;
+    $("daily_workers").value=d.workers; $("daily_engineers").value=d.engineers;
+    $("daily_notes").value=d.notes;
+    // تحميل قائمة الأعمال التنفيذية والإدارية والمرسل
+    renderWork("daily");
+    renderAdminList();
+    $("daily_sender").value = d.sender || "مدير المشروع";
+  }
+  if (type==="plan"){
+    $("plan_date").value=d.date; $("plan_need_pm").value=d.need_pm;
+    $("plan_start").value=d.start || "";
+    $("plan_duration").value = Number(d.duration||0);
+    $("plan_notes").value=d.notes;
+    $("plan_sender").value = d.sender || "مدير المشروع";
+    renderWork("plan");
+  }
+  if (type==="material"){
+    $("mat_date").value=d.date; $("mat_status").value=d.status;
+    $("mat_item").value=d.item; $("mat_supplier").value=d.supplier;
+    $("mat_notes").value=d.notes;
+    if (d.main){ $("mat_main").value=d.main; }
+    fillSub("mat");
+    if (d.sub){ $("mat_sub").value=d.sub; }
+    fillAct("mat");
+    if (d.act){ $("mat_act").value=d.act; }
+    $("mat_sender").value = d.sender || "مدير المشروع";
+  }
+  if (type==="ncr"){
+    $("ncr_sev").value=d.sev; $("ncr_desc").value=d.desc;
+    $("ncr_action").value=d.action; $("ncr_deadline").value=d.deadline;
+    $("ncr_sender").value = d.sender || "مدير المشروع";
+  }
+  if (type==="inspection"){
+    $("insp_dt").value=d.dt; $("insp_need_pm").value=d.need_pm;
+    $("insp_type").value=d.type; $("insp_loc").value=d.loc; $("insp_notes").value=d.notes;
+    $("insp_sender").value = d.sender || "مدير المشروع";
+  }
+}
+
+function nextNcrNo(){
+  const n = state.reports.filter(r=>r.type==="ncr").reduce((mx,r)=>{
+    const m=(r.meta?.ncrNo||"").match(/NCR-(\d+)/); return m ? Math.max(mx,Number(m[1])) : mx;
+  },0);
+  return "NCR-" + String(n+1).padStart(3,"0");
+}
+function refreshNcrNo(){ $("ncr_no").value = nextNcrNo(); }
+
+function generate(type){
+  const d = readForm(type);
+  setDraft(type,d);
+  const s = state.settings;
+  const enteredBy = s.name ? `المُدخل: ${s.name}` : "المُدخل: (غير محدد)";
+  const senderLine = d.sender ? `المرسل: ${d.sender}` : "";
+
+  const lines=[];
+  let title="";
+  let meta={};
+
+  if (type==="daily"){
+    title="تقرير يومي";
+    lines.push("=== تقرير يومي | مشروع حديقة المزة ===");
+    lines.push(`التاريخ: ${d.date}`);
+    lines.push(`الطقس: ${d.weather}`);
+    lines.push(`العمال: ${d.workers} | المهندسون: ${d.engineers}`);
+    lines.push("------------------------------");
+    lines.push("الأعمال المنفذة:");
+    if (!(d.work||[]).length) lines.push("لا يوجد");
+    else (d.work||[]).forEach((it,i)=>{
+      const base=`${i+1}) ${it.main} / ${it.sub} / ${it.act}`;
+      lines.push(it.note? base + ` — ملاحظة: ${it.note}` : base);
+    });
+    // الأعمال الإدارية/التنسيقية
+    if ((d.admin||[]).length){
+      lines.push("------------------------------");
+      lines.push("الأعمال الإدارية/التنسيقية:");
+      (d.admin||[]).forEach((item,i)=>{
+        lines.push(`${i+1}) ${item}`);
+      });
+    }
+    if (d.notes){ lines.push("------------------------------"); lines.push(`ملاحظات: ${d.notes}`); }
+    lines.push("------------------------------");
+    lines.push(enteredBy);
+    if (senderLine) lines.push(senderLine);
+    meta={date:d.date,weather:d.weather,workers:d.workers,engineers:d.engineers};
+  }
+
+  if (type==="plan"){
+    title="خطة الغد";
+    lines.push("=== خطة عمل اليوم التالي | مشروع حديقة المزة ===");
+    lines.push(`التاريخ: ${d.date}`);
+    lines.push(`يتطلب تواجد مدير المشروع؟: ${d.need_pm==="yes"?"نعم":"لا"}`);
+    // وقت البدء والمدة
+    lines.push(`وقت البدء: ${d.start ? d.start : "—"}`);
+    lines.push(`المدة التقديرية: ${d.duration ? d.duration + " ساعة" : "—"}`);
+    lines.push("------------------------------");
+    lines.push("الأعمال المخططة:");
+    if (!(d.work||[]).length) lines.push("لا يوجد");
+    else (d.work||[]).forEach((it,i)=>{
+      const base=`${i+1}) ${it.main} / ${it.sub} / ${it.act}`;
+      lines.push(it.note? base + ` — ملاحظة: ${it.note}` : base);
+    });
+    if (d.notes){ lines.push("------------------------------"); lines.push(`ملاحظات: ${d.notes}`); }
+    lines.push("------------------------------");
+    lines.push(enteredBy);
+    if (senderLine) lines.push(senderLine);
+    meta={date:d.date,needPm:d.need_pm,start:d.start||"",duration:d.duration||0};
+  }
+
+  if (type==="material"){
+    title="اعتماد مواد";
+    const statusAr={pending:"قيد الدراسة",approved:"مقبول",conditional:"مقبول بملاحظات",rejected:"مرفوض"}[d.status] || "قيد الدراسة";
+    lines.push("=== اعتماد مواد | مشروع حديقة المزة ===");
+    lines.push(`التاريخ: ${d.date}`);
+    lines.push(`المرجع: ${d.main} / ${d.sub} / ${d.act}`);
+    lines.push(`المادة/الوصف: ${d.item||"—"}`);
+    lines.push(`المورد/المصدر: ${d.supplier||"—"}`);
+    lines.push("------------------------------");
+    lines.push(`القرار: ${statusAr}`);
+    if (d.notes) lines.push(`ملاحظات القرار: ${d.notes}`);
+    lines.push("------------------------------");
+    lines.push(enteredBy);
+    if (senderLine) lines.push(senderLine);
+    meta={date:d.date,status:d.status,link:`${d.main} / ${d.sub} / ${d.act}`};
+  }
+
+  if (type==="ncr"){
+    title="NCR عدم مطابقة";
+    const sevAr={low:"منخفض",med:"متوسط",high:"عال"}[d.sev] || "متوسط";
+    const ncrNo=$("ncr_no").value;
+
+    lines.push("=== محضر عدم مطابقة (NCR) | مشروع حديقة المزة ===");
+    lines.push(`الرقم: ${ncrNo}`);
+    lines.push(`الخطورة: ${sevAr}`);
+    lines.push(`البند: ${d.main} / ${d.sub} / ${d.act}`);
+    lines.push("------------------------------");
+    lines.push(`وصف المخالفة: ${d.desc||"—"}`);
+    lines.push(`الإجراء التصحيحي: ${d.action||"—"}`);
+    lines.push(`المهلة: ${d.deadline}`);
+    if (d.file && state.settings.keepFiles==="no") lines.push("مرفقات: تم إرفاق صورة (غير محفوظة داخل السجل)");
+    if (d.file && state.settings.keepFiles==="yes") lines.push("مرفقات: صورة محفوظة داخل السجل");
+    lines.push("------------------------------");
+    lines.push(enteredBy);
+    if (senderLine) lines.push(senderLine);
+
+    meta={ncrNo, severity:d.sev, link:`${d.main} / ${d.sub} / ${d.act}`};
+  }
+
+  if (type==="inspection"){
+    title="طلب فحص";
+    lines.push("=== طلب فحص | مشروع حديقة المزة ===");
+    lines.push(`النوع: ${d.type}`);
+    lines.push(`الموقع/المكان: ${d.loc||"—"}`);
+    lines.push(`التاريخ/الوقت المقترح: ${d.dt? d.dt.replace("T"," ") : "—"}`);
+    lines.push(`يتطلب حضور مدير المشروع؟: ${d.need_pm==="yes"?"نعم":"لا"}`);
+    lines.push("------------------------------");
+    lines.push(`السبب/الوصف: ${d.notes||"—"}`);
+    lines.push("------------------------------");
+    lines.push(enteredBy);
+    if (senderLine) lines.push(senderLine);
+
+    meta={dt:d.dt,needPm:d.need_pm,inspType:d.type,loc:d.loc};
+  }
+
+  const text=lines.join("\n");
+  current={id:uid(),type, title, text, createdAt:new Date().toISOString(), meta, payload:{type,title,text,meta,draft:d}};
+  openOut(title,text);
+}
+
+function openOut(title,text){
+  $("outTitle").textContent=title;
+  $("outText").textContent=text;
+  $("outHint").textContent="يمكنك نسخ النص أو مشاركته أو إرساله عبر واتساب أو طباعته/حفظه PDF أو حفظه بالسجل.";
+  $("outModal").classList.add("open");
+}
+function closeOut(){ $("outModal").classList.remove("open"); }
+
+async function shareText(){
+  if (!current) return;
+  if (navigator.share){
+    try{ await navigator.share({title:current.title,text:current.text}); toast("تمت المشاركة."); }
+    catch(e){ toast("تعذر إتمام المشاركة."); }
+  } else toast("المشاركة غير مدعومة هنا. استخدم النسخ.");
+}
+async function copyText(){
+  if (!current) return;
+  try{ await navigator.clipboard.writeText(current.text); toast("تم النسخ."); }
+  catch(e){
+    const ta=document.createElement("textarea"); ta.value=current.text; document.body.appendChild(ta);
+    ta.select(); document.execCommand("copy"); ta.remove(); toast("تم النسخ.");
+  }
+}
+function waText(){ if(!current) return; window.open("https://wa.me/?text="+encodeURIComponent(current.text),"_blank"); }
+function downloadTXT(){
+  if(!current) return;
+  const blob=new Blob([current.text],{type:"text/plain;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=`mazza_${current.type}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function printText(){ if(!current) return; window.print(); }
+
+function typeLabel(t){ return {daily:"تقرير يومي",plan:"خطة الغد",material:"اعتماد مواد",ncr:"NCR",inspection:"طلب فحص"}[t] || t; }
+
+function saveToHistory(){
+  if (!current) return;
+  state.reports.unshift(current);
+  const max=Number(state.settings.maxReports ?? 200);
+  if (max>0 && state.reports.length>max) state.reports=state.reports.slice(0,max);
+  saveState(); renderLast(); toast("تم الحفظ بالسجل.");
+}
+function renderLast(){
+  const r=state.reports[0];
+  $("lastReport").textContent = r ? `آخر تقرير: ${typeLabel(r.type)} • ${r.createdAt.slice(0,10)}` : "آخر تقرير: لا يوجد";
+}
+
+function renderHistory(){
+  const q=($("hist_q").value||"").trim().toLowerCase();
+  const t=$("hist_type").value||"all";
+  const items=state.reports.filter(r=>{
+    if (t!=="all" && r.type!==t) return false;
+    if (!q) return true;
+    return (r.text||"").toLowerCase().includes(q);
+  });
+  const el=$("hist_list");
+  if (!items.length){ el.textContent="لا يوجد تقارير مطابقة."; return; }
+  el.innerHTML="";
+  items.forEach(r=>{
+    const div=document.createElement("div");
+    div.className="card";
+    const hasDoc = r.meta && r.meta.docUrl;
+    const docBtn = hasDoc
+      ? `<button onclick="openDoc('${r.id}')">فتح Doc</button>`
+      : `<button onclick="docOne('${r.id}')">Doc</button>`;
+    div.innerHTML = `
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+        <div style="min-width:0">
+          <b>${typeLabel(r.type)}</b>
+          <div class="muted">${r.createdAt.slice(0,10)} • ${r.title}</div>
+        </div>
+        <button onclick="delReport('${r.id}')" class="danger">حذف</button>
+      </div>
+      <div class="btns">
+        <button onclick="openSaved('${r.id}')">عرض</button>
+        <button onclick="copySaved('${r.id}')">نسخ</button>
+        <button onclick="waSaved('${r.id}')">واتساب</button>
+      </div>
+      <div class="btns">
+        <button onclick="jsonOne('${r.id}')">JSON</button>
+        ${docBtn}
+      </div>`;
+    el.appendChild(div);
+  });
+}
+function findReport(id){ return state.reports.find(x=>x.id===id); }
+function openSaved(id){ const r=findReport(id); if(!r) return; current=r; openOut(r.title,r.text); }
+function copySaved(id){ const r=findReport(id); if(!r) return; current=r; copyText(); }
+function waSaved(id){ const r=findReport(id); if(!r) return; window.open("https://wa.me/?text="+encodeURIComponent(r.text),"_blank"); }
+function delReport(id){
+  if (!confirm("حذف هذا التقرير؟")) return;
+  state.reports=state.reports.filter(x=>x.id!==id);
+  saveState(); renderHistory(); renderLast();
+}
+
+// فتح مستند Google المرتبط بالتقرير إن وجد؛ وإلا إنشاءه
+function openDoc(id){
+  const r = findReport(id);
+  if(!r) return;
+  if(r.meta && r.meta.docUrl){
+    window.open(r.meta.docUrl, "_blank");
+  } else {
+    docOne(id);
+  }
+}
+function downloadJson(obj, filename){
+  const blob=new Blob([JSON.stringify(obj,null,2)],{type:"application/json;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=filename;
+  a.click(); URL.revokeObjectURL(a.href);
+}
+function jsonOne(id){
+  const r=findReport(id); if(!r) return;
+  downloadJson(r, `mazza_${r.type}_${r.id}.json`);
+}
+function exportJSONFiltered(){
+  const q=($("hist_q").value||"").trim().toLowerCase();
+  const t=$("hist_type").value||"all";
+  const items=state.reports.filter(r=>{
+    if (t!=="all" && r.type!==t) return false;
+    if (!q) return true;
+    return (r.text||"").toLowerCase().includes(q);
+  });
+  downloadJson({exportedAt:new Date().toISOString(),filter:{type:t,query:q},reports:items},
+    `mazza_export_${t}_${new Date().toISOString().slice(0,10)}.json`);
+}
+function exportJSONAll(){
+  downloadJson({exportedAt:new Date().toISOString(),filter:{type:"all"},reports:state.reports},
+    `mazza_export_all_${new Date().toISOString().slice(0,10)}.json`);
+}
+
+async function postWebhook(payload){
+  const url=(state.settings.webhookUrl||"").trim();
+  if (!url){ toast("أدخل Webhook URL في الإعدادات."); return false; }
+  try{
+    const res=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    if (!res.ok){ toast("فشل الإرسال إلى Sheet."); return false; }
+    toast("تم الإرسال إلى Sheet."); return true;
+  } catch(e){ toast("تعذر الاتصال بالـWebhook."); return false; }
+}
+function sheetPayload(r){
+  const s=state.settings;
+  return {project:s.title, enteredBy:s.name||"", reportType:r.type, reportTitle:r.title, createdAt:r.createdAt, meta:r.meta||{}, text:r.text, raw:r.payload||r};
+}
+async function sheetCurrent(){ if(!current) return; await postWebhook(sheetPayload(current)); }
+async function sheetOne(id){ const r=findReport(id); if(!r) return; await postWebhook(sheetPayload(r)); }
+async function exportToSheetFiltered(){
+  const q=($("hist_q").value||"").trim().toLowerCase();
+  const t=$("hist_type").value||"all";
+  const items=state.reports.filter(r=>{
+    if (t!=="all" && r.type!==t) return false;
+    if (!q) return true;
+    return (r.text||"").toLowerCase().includes(q);
+  });
+  if (!items.length){ toast("لا يوجد تقارير للإرسال."); return; }
+  const s=state.settings;
+  await postWebhook({batch:true,project:s.title,enteredBy:s.name||"",exportedAt:new Date().toISOString(),filter:{type:t,query:q},reports:items.map(sheetPayload)});
+}
+async function testWebhook(){
+  const s=state.settings;
+  await postWebhook({test:true,sentAt:new Date().toISOString(),message:"اختبار اتصال من تطبيق حديقة المزة",project:s.title,enteredBy:s.name||""});
+}
+
+// ====== Google Docs Integration ======
+function docPayload(r){
+  return {
+    type: r.type,
+    id: r.id,
+    createdAt: r.createdAt,
+    payload: r.payload || {},
+    generatedText: r.text,
+    meta: r.meta || {}
+  };
+}
+async function postDoc(payload){
+  const url = (state.settings.docWebhookUrl || "").trim();
+  if (!url){ toast("أدخل رابط Google Doc في الإعدادات."); return null; }
+  let fullUrl = url;
+  const token = (state.settings.docWebhookToken || "").trim();
+  if (token){
+    fullUrl = url.includes("?") ? `${url}&token=${encodeURIComponent(token)}` : `${url}?token=${encodeURIComponent(token)}`;
+  }
+  try{
+    const res = await fetch(fullUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+    let json={};
+    try{ json = await res.json(); } catch(e){ json = {}; }
+    if(!res.ok || (json.ok!==undefined && !json.ok)){
+      throw new Error(json.error || res.statusText || res.status);
+    }
+    return json;
+  } catch(e){ return {error:String(e.message||e)}; }
+}
+async function docCurrent(){
+  if(!current) return;
+  const r=current;
+  const payload = docPayload(r);
+  const res = await postDoc(payload);
+  if (!res || res.error){
+    state.pendingDocs = state.pendingDocs || [];
+    state.pendingDocs.push({id: r.id, payload});
+    saveState();
+    toast("تعذر إرسال التقرير. تمت إضافته لقائمة الانتظار.");
+    $("outHint").textContent = "تعذر إرسال التقرير. تمت إضافته لقائمة الانتظار.";
+    return;
+  }
+  // Success
+  if(res.docUrl){
+    // update current and history
+    current.meta = current.meta || {};
+    current.meta.docUrl = res.docUrl;
+    const rep = findReport(r.id);
+    if (rep){
+      rep.meta = rep.meta || {};
+      rep.meta.docUrl = res.docUrl;
+    }
+    saveState();
+    renderHistory();
+  }
+  toast("تم إنشاء مستند Google بنجاح.");
+  $("outHint").textContent = "تم إنشاء مستند Google بنجاح.";
+}
+async function docOne(id){
+  const r = findReport(id);
+  if(!r) return;
+  const payload = docPayload(r);
+  const res = await postDoc(payload);
+  if(!res || res.error){
+    state.pendingDocs = state.pendingDocs || [];
+    state.pendingDocs.push({id: r.id, payload});
+    saveState();
+    toast("تعذر إرسال التقرير. تمت إضافته لقائمة الانتظار.");
+    return;
+  }
+  if(res.docUrl){
+    r.meta = r.meta || {};
+    r.meta.docUrl = res.docUrl;
+    saveState();
+    renderHistory();
+  }
+  toast("تم إنشاء مستند Google بنجاح.");
+}
+async function retryPendingDocs(){
+  const list = Array.isArray(state.pendingDocs) ? state.pendingDocs.slice() : [];
+  if(!list.length) return;
+  const remaining=[];
+  for(const item of list){
+    const res = await postDoc(item.payload);
+    if(!res || res.error){
+      remaining.push(item);
+    } else if(res.docUrl){
+      const rep = findReport(item.id);
+      if(rep){ rep.meta = rep.meta || {}; rep.meta.docUrl = res.docUrl; }
+    }
+  }
+  state.pendingDocs = remaining;
+  saveState();
+  if(!remaining.length){ toast("تم إرسال جميع التقارير المؤجلة."); }
+}
+window.addEventListener("online", ()=>{ retryPendingDocs(); });
+
+// إشعار المستخدم عند توفر تحديث جديد للتطبيق
+function showUpdatePrompt(reg){
+  // استخدم confirm لإبلاغ المستخدم بوجود تحديث
+  if (confirm("يوجد تحديث جديد للتطبيق. هل تريد تحديث الآن؟")){
+    if (reg.waiting){ reg.waiting.postMessage({action:"skipWaiting"}); }
+  } else {
+    toast("سيتم تطبيق التحديث عند إعادة تشغيل التطبيق.");
+  }
+}
+
+// عند تغيير المسيطر (بعد تفعيل العامل الجديد)، أعد تحميل الصفحة
+if ("serviceWorker" in navigator){
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    window.location.reload();
+  });
+}
+
+function fillSettings(){
+  const s=state.settings;
+  $("set_title").value=s.title||"";
+  $("set_name").value=s.name||"";
+  $("set_start").value=s.startDate||new Date().toISOString().slice(0,10);
+  $("set_dur").value=Number(s.durationDays||45);
+  $("set_max").value=Number(s.maxReports??200);
+  $("set_keep_files").value=s.keepFiles||"no";
+  $("set_webhook").value=s.webhookUrl||"";
+  // Fill Google Docs settings
+  $("set_doc_webhook").value=s.docWebhookUrl||"";
+  $("set_doc_token").value=s.docWebhookToken||"";
+}
+function saveSettings(){
+  state.settings.title=$("set_title").value||DEFAULTS.settings.title;
+  state.settings.name=$("set_name").value||"";
+  state.settings.startDate=$("set_start").value||new Date().toISOString().slice(0,10);
+  state.settings.durationDays=Number($("set_dur").value||45);
+  state.settings.maxReports=Number($("set_max").value||200);
+  state.settings.keepFiles=$("set_keep_files").value||"no";
+  state.settings.webhookUrl=$("set_webhook").value||"";
+  state.settings.docWebhookUrl=$("set_doc_webhook").value||"";
+  state.settings.docWebhookToken=$("set_doc_token").value||"";
+  saveState(); toast("تم حفظ الإعدادات."); navTo("dashboard");
+}
+function resetAll(){
+  if(!confirm("سيتم مسح كل البيانات. هل أنت متأكد؟")) return;
+  localStorage.removeItem(KEY); location.reload();
+}
+
+$("ncr_file").addEventListener("change", (e)=>{
+  const file=e.target.files && e.target.files[0];
+  if (!file) return;
+  const keep = state.settings.keepFiles==="yes";
+  const d=getDraft("ncr");
+  if (!keep){
+    d.file={name:file.name,type:file.type,size:file.size,kept:false};
+    setDraft("ncr",d); toast("تم اختيار صورة (غير محفوظة)."); return;
+  }
+  const fr=new FileReader();
+  fr.onload=()=>{
+    d.file={name:file.name,type:file.type,size:file.size,kept:true,dataUrl:fr.result};
+    setDraft("ncr",d); toast("تم حفظ المرفق داخل السجل.");
+  };
+  fr.readAsDataURL(file);
+});
+
+let toastTimer=null;
+function toast(msg){
+  let t=document.getElementById("toast");
+  if(!t){
+    t=document.createElement("div");
+    t.id="toast";
+    t.style.position="fixed";
+    t.style.left="50%";
+    t.style.transform="translateX(-50%)";
+    t.style.bottom="calc(92px + env(safe-area-inset-bottom))";
+    t.style.padding="10px 12px";
+    t.style.border="1px solid rgba(255,255,255,.12)";
+    t.style.background="rgba(255,255,255,.98)";
+    t.style.color="#111827";
+    t.style.borderRadius="999px";
+    t.style.zIndex="99";
+    t.style.fontSize="13px";
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity="1";
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.style.opacity="0", 1700);
+}
+
+if ("serviceWorker" in navigator){
+  // سجل خدمة العامل وخطط لإشعار المستخدم عند توفر تحديث جديد
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").then((reg) => {
+      // إذا كان هناك عامل بانتظار التفعيل، اعرض تنبيه
+      if (reg.waiting) {
+        showUpdatePrompt(reg);
+      }
+      reg.addEventListener("updatefound", () => {
+        const newWorker = reg.installing;
+        newWorker.addEventListener("statechange", () => {
+          if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            showUpdatePrompt(reg);
+          }
+        });
+      });
+    }).catch(() => {});
+  });
+}
+
+$("hist_q").addEventListener("input", renderHistory);
+$("hist_type").addEventListener("change", renderHistory);
+
+(async function init(){
+  TAXONOMY = await loadTaxonomy();
+  if (!TAXONOMY.length){ toast("تعذر تحميل taxonomy.json. سيتم استخدام قائمة احتياطية. إذا كانت القوائم لا تظهر: تأكد أن taxonomy.json موجود بجانب index.html على Netlify."); }
+  $("appTitle").textContent=state.settings.title||DEFAULTS.settings.title;
+  ["daily","plan","mat","ncr"].forEach(fillMain);
+
+  // ملء قائمة الأعمال الإدارية الافتراضية
+  fillAdminSelect();
+
+  fillForm("daily");
+  fillForm("plan");
+  fillForm("material");
+  fillForm("ncr");
+  fillForm("inspection");
+
+  renderLast();
+  const last=localStorage.getItem("mazza_pm_v3_last_view") || "dashboard";
+  navTo(last);
+  refreshNcrNo();
+})();
+</script>
+</body>
+</html>
